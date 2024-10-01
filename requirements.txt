@@ -1,0 +1,8 @@
+accelerate==0.34.2
+datasets==3.0.0
+fastchat==0.1.0
+numpy==2.1.1
+pandas==2.2.3
+torch==2.1.0+cu118
+tqdm==4.66.5
+transformers==4.44.2
