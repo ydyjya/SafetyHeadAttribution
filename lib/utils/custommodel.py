@@ -190,7 +190,6 @@ class CustomLlamaAttention(LlamaAttention):
         bsz, q_len, _ = hidden_states.size()
 
         if head_mask is not None and mask_para is True:
-            # print("----------Mask Weight----------")
             for head_info, qkv_list in head_mask.items():
                 if head_info[0] == self.layer_idx:
                     head_idx = head_info[1]
@@ -241,20 +240,15 @@ class CustomLlamaAttention(LlamaAttention):
         value_states = value_states.view(bsz, q_len, self.num_key_value_heads, self.head_dim).transpose(1, 2)
 
         if head_mask is not None and (mask_para is False or mask_para is None):
-            # print("----------Mask Var----------")
             for head_info, qkv_list in head_mask.items():
                 if head_info[0] == self.layer_idx:
                     head_idx = head_info[1]
                     for qkv in qkv_list:
                         if qkv == "q":
-                            # print(f"Before: {torch.mean(query_states[:, head_idx, :, :])}")
                             if mask_type == 'scale_mask':
                                 query_states[:, head_idx, :, :] *= scale_factor
                             elif mask_type == 'mean_mask':
-                                # print(query_states[:, head_idx, :, :].shape, query_states[:, :, :, :].mean(dim=1,keepdim=False).shape)
-                                # print(self.q_proj.weight.data[head_idx * 128:(head_idx+1) * 128, :].shape,self.q_proj.weight.data.view(self.num_heads, self.head_dim, -1).mean(dim=0,keepdim=False).shape)
                                 query_states[:, head_idx, :, :] = query_states[:, :, :, :].mean(dim=1,keepdim=False)
-                            # print(f"After: {torch.mean(query_states[:, head_idx, :, :])}")
                         elif qkv == 'k':
                             if mask_type == 'scale_mask':
                                 key_states[:, head_idx, :, :] *= scale_factor
@@ -283,7 +277,6 @@ class CustomLlamaAttention(LlamaAttention):
         attn_weights = nn.functional.dropout(attn_weights, p=self.attention_dropout, training=self.training)
         attn_output = torch.matmul(attn_weights, value_states)
         if head_mask is not None and (mask_para is False or mask_para is None):
-            # print("----------Mask Var----------")
             for head_info, qkv_list in head_mask.items():
                 if head_info[0] == self.layer_idx:
                     head_idx = head_info[1]

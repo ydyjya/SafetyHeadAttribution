@@ -11,7 +11,7 @@ import json
 default_search_cfg = {
     "search_step": 1,
     "mask_qkv": ['q'],
-    "scale_factor": 0.0001,
+    "scale_factor": 1e-5,
     "mask_type": "scale_mask"
 }
 
@@ -47,15 +47,12 @@ def get_last_hidden_states(model, tokenizer, data, mask_cfg=None):
                             output_hidden_states=True,
                            )
             now_lhs = outputs.hidden_states[-1]
-            # print(outputs)
-            # now_lhs = outputs.hidden_states[-1]
             last_hidden_states.append(now_lhs[:, -1, :].reshape(-1))
         last_hidden_states = torch.stack(last_hidden_states)
         return last_hidden_states
 
 
 def get_safety_subspace_shifts(base_last_hidden_states, last_hidden_states):
-    # shifts = compute_subspace_nuclear_norm(base_last_hidden_states, last_hidden_states)
     shifts = compute_subspace_similarity(base_last_hidden_states, last_hidden_states)
     return shifts
 
@@ -84,10 +81,6 @@ def safety_head_attribution(model_name, data_path, storage_path=None, search_cfg
     else:
         all_lhs = None
     for step in range(search_step):
-        """if step != search_step - 1:
-            mask_cfg = update_mask_cfg(mask_cfg, 2, 26, temp=False)
-            mask_cfg = update_mask_cfg(mask_cfg, 3, 8, temp=False)
-            continue"""
         shifts_dict = {}
         for layer in tqdm(range(0, layer_nums)):
             for head in range(0, head_nums):
@@ -115,9 +108,9 @@ def safety_head_attribution(model_name, data_path, storage_path=None, search_cfg
 
 
 if __name__ == '__main__':
-    model_path = "/mnt/workspace/zzh/SafetyHeadAttribution/Llama-2-7b-chat-hf"
-    data_path = "/mnt/workspace/zzh/SafetyHeadAttribution/exp_data/maliciousinstruct.csv"
-    storage_path = "/mnt/workspace/zzh/SafetyHeadAttribution/exp_res/sahara"
+    model_path = "./SafetyHeadAttribution/Llama-2-7b-chat-hf"
+    data_path = "./SafetyHeadAttribution/exp_data/maliciousinstruct.csv"
+    storage_path = "./SafetyHeadAttribution/exp_res/sahara"
     if not os.path.exists(storage_path):
         os.makedirs(storage_path)
 

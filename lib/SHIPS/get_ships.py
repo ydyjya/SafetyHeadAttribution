@@ -1,5 +1,5 @@
 import sys
-sys.path.append("/mnt/workspace/zzh/SafetyHeadAttribution")
+sys.path.append("./SafetyHeadAttribution")
 print(sys.path)
 
 from tqdm import tqdm
@@ -187,16 +187,12 @@ if __name__ == "__main__":
         "scale_factor": 0.0001,
         "mask_type": "scale_mask",
     }
-    # maliciousinstruct.csv
-    # jailbreakbench.csv
-    # advbench.csv
-    test = SHIPS("/mnt/workspace/zzh/SafetyHeadAttribution/exp_data/maliciousinstruct.csv",
-                 "/mnt/workspace/zzh/SafetyHeadAttribution/Mistral-7B-Instruct-v0.2",
+
+    test = SHIPS("./SafetyHeadAttribution/exp_data/maliciousinstruct.csv",
+                 "./SafetyHeadAttribution/Mistral-7B-Instruct-v0.2",
                  mask_cfg=mask_config,
                  device="cuda:1")
     test.main("./maliciousinstruct-mistral.jsonl", generate_flag=False)
     for mask_n in range(1, 2):
         test.ships_test("./maliciousinstruct-mistral.jsonl", top_k=1, mask_num=mask_n,max_new_tokens=32)
         test.ships_test("./maliciousinstruct-mistral.jsonl", top_k=5, mask_num=mask_n,max_new_tokens=32)
-        # test.ships_test("./jailbreakbench.jsonl", top_k=1, mask_num=mask_n, max_new_tokens=32)
-        # test.ships_test("./jailbreakbench.jsonl", top_k=5, mask_num=mask_n, max_new_tokens=32)
