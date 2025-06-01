@@ -91,8 +91,8 @@ def safety_head_attribution(model_name, data_path, storage_path=None, search_cfg
                     last_hs = get_last_hidden_states(model, tokenizer, data, now_mask_cfg)
                     if all_lhs is not None:
                         all_lhs[(layer, head)] = last_hs.detach().cpu()
-                    # shifts = get_safety_subspace_shifts(base_lhs, last_hs)
-                    shifts = compute_subspace_spectral_norm(base_lhs, last_hs)
+                    shifts = get_safety_subspace_shifts(base_lhs, last_hs)
+                    # shifts = compute_subspace_spectral_norm(base_lhs, last_hs)
                     print(f"{layer}, {head}"
                           f", {shifts}"
                           f"")
